@@ -1,0 +1,6 @@
+gym_data.json
+health_data.json
+__pycache__/
+*.pyc
+*.pyo
+.DS_Store

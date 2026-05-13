@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -s http://localhost:8080/api/info)",
+      "Bash(xargs kill -9)",
+      "Bash(python3 server.py)",
+      "Bash(sed -i '' 's/d\\\\.toISOString\\(\\)\\\\.slice\\(0, 10\\)/localDate\\(d\\)/g' \"/Users/Anas Gym Tracking/js/calories.js\" \"/Users/Anas Gym Tracking/js/workouts.js\" \"/Users/Anas Gym Tracking/js/ui.js\")",
+      "Bash(sed -i '' 's/mon\\\\.toISOString\\(\\)\\\\.slice\\(0, 10\\)/localDate\\(mon\\)/g' \"/Users/Anas Gym Tracking/js/workouts.js\")",
+      "Bash(sed -i '' 's/sun\\\\.toISOString\\(\\)\\\\.slice\\(0, 10\\)/localDate\\(sun\\)/g' \"/Users/Anas Gym Tracking/js/workouts.js\")",
+      "Bash(sed -i '' 's/nextD\\\\.toISOString\\(\\)\\\\.slice\\(0, 10\\)/localDate\\(nextD\\)/g' \"/Users/Anas Gym Tracking/js/ui.js\")",
+      "Bash(networksetup -getinfo Wi-Fi)",
+      "Bash(networksetup -setmanual Wi-Fi 192.168.2.60 255.255.255.0 192.168.2.1)",
+      "Bash(networksetup -setdhcp Wi-Fi)",
+      "Bash(ls ~/Library/Safari/LocalStorage/ 2>/dev/null | grep -i \"localhost\\\\|192.168\")",
+      "Read(//Users/Apple/Library/Safari/LocalStorage//**)",
+      "Bash(find ~/Library -name \"*.localstorage\" 2>/dev/null | grep -v \"com.apple\" | head -10 *)",
+      "Read(//Users/Apple/Library/**)",
+      "Read(//Users/Apple/Library/WebKit/**)",
+      "Bash(gh auth *)"
+    ]
+  }
+}
