@@ -1,6 +1,6 @@
-const CACHE = 'gymtrack-v8';
+const CACHE = 'gymtrack-v9';
 const ASSETS = ['/', '/index.html', '/manifest.json', '/css/styles.css',
-  '/js/storage.js', '/js/tdee.js', '/js/health.js', '/js/workouts.js',
+  '/js/config.js', '/js/storage.js', '/js/tdee.js', '/js/health.js', '/js/workouts.js',
   '/js/calories.js', '/js/dashboard.js', '/js/ui.js', '/js/app.js',
   '/icons/icon-192.png', '/icons/icon-512.png'];
 

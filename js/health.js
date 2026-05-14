@@ -1,51 +1,43 @@
 const Health = {
-  async init() {
-    // Fetch the server's LAN IP so the Shortcut URL works from iPhone
-    try {
-      const info = await fetch('/api/info').then(r => r.json());
-      if (info.ip) Storage.set('server_info', info);
-    } catch {}
-  },
+  async init() { /* no-op — no LAN IP needed with Supabase */ },
 
   async refresh() {
     try {
-      const res = await fetch('/api/health');
-      if (!res.ok) return false;
-      const all = await res.json();
-      Storage.set('health_cache', all);
-      return true;
-    } catch {
-      return false;
-    }
+      const cache = {};
+      const today = new Date();
+      const fetches = [];
+      for (let i = 0; i < 14; i++) {
+        const d = new Date(today);
+        d.setDate(d.getDate() - i);
+        const dateStr = localDate(d);
+        fetches.push(
+          fetch(`${SUPABASE_URL}/storage/v1/object/healthdata/${dateStr}.json`, {
+            headers: { 'Authorization': `Bearer ${SUPABASE_KEY}`, 'apikey': SUPABASE_KEY }
+          })
+            .then(r => r.ok ? r.json().then(data => { cache[dateStr] = data; }) : null)
+            .catch(() => null)
+        );
+      }
+      await Promise.all(fetches);
+      if (Object.keys(cache).length > 0) Storage.set('health_cache', cache);
+      return Object.keys(cache).length > 0;
+    } catch { return false; }
   },
 
-  // Base sync URL for the Shortcut (uses LAN IP so iPhone can reach the Mac)
   getSyncUrl() {
-    const info = Storage.get('server_info');
-    const base = (info && info.ip && info.ip !== 'localhost' && info.ip !== '127.0.0.1')
-      ? `http://${info.ip}:${info.port || 8080}`
-      : window.location.origin;
-    return `${base}/api/sync?active=`;
+    return `${SUPABASE_URL}/storage/v1/object/healthdata/`;
   },
 
-  getCache() {
-    return Storage.get('health_cache') || {};
-  },
+  getSyncKey() { return SUPABASE_KEY; },
 
-  getDay(dateStr) {
-    return this.getCache()[dateStr] || null;
-  },
-
-  getToday() {
-    return this.getDay(localDate());
-  },
+  getCache() { return Storage.get('health_cache') || {}; },
+  getDay(dateStr) { return this.getCache()[dateStr] || null; },
+  getToday() { return this.getDay(localDate()); },
 
   totalBurned(entry) {
     if (!entry) return 0;
     return Math.round((entry.activeEnergy || 0) + (entry.restingEnergy || 0));
   },
 
-  isConnected() {
-    return Object.keys(this.getCache()).length > 0;
-  }
+  isConnected() { return Object.keys(this.getCache()).length > 0; }
 };

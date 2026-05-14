@@ -37,9 +37,14 @@ const Storage = {
 
   async _pushToServer() {
     try {
-      await fetch('/api/data', {
+      await fetch(`${SUPABASE_URL}/storage/v1/object/gymdata/data.json`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Authorization': `Bearer ${SUPABASE_KEY}`,
+          'apikey': SUPABASE_KEY,
+          'Content-Type': 'application/json',
+          'x-upsert': 'true'
+        },
         body: JSON.stringify(this.exportAll())
       });
     } catch {}
@@ -47,7 +52,9 @@ const Storage = {
 
   async syncFromServer() {
     try {
-      const res = await fetch('/api/data');
+      const res = await fetch(`${SUPABASE_URL}/storage/v1/object/gymdata/data.json`, {
+        headers: { 'Authorization': `Bearer ${SUPABASE_KEY}`, 'apikey': SUPABASE_KEY }
+      });
       if (!res.ok) return false;
       const data = await res.json();
       if (Object.keys(data).length === 0) return false;
