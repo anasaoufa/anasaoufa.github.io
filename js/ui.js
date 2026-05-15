@@ -994,6 +994,7 @@ const UI = {
     };
     ns.tdee = TDEE.calculateTDEE(ns);
     ns.calorieTarget = ns.tdee + ns.surplusKcal;
+    ns.updatedAt = new Date().toISOString();
     Storage.set('settings', ns);
     this.showToast('Settings saved!');
     if (document.getElementById('tab-profile') && !document.getElementById('tab-profile').classList.contains('hidden')) {
