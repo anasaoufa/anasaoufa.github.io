@@ -401,6 +401,29 @@ const UI = {
 
   // ── Active workout ────────────────────────────────────────────────────────
 
+  _saveActiveWorkout() {
+    if (this.activeWorkout) {
+      Storage.set('active_workout', { workout: this.activeWorkout, timerStart: this._timerStart });
+    }
+  },
+
+  _clearActiveWorkout() {
+    Storage.remove('active_workout');
+  },
+
+  restoreActiveWorkout() {
+    const saved = Storage.get('active_workout');
+    if (!saved || !saved.workout) return false;
+    if (saved.workout.date !== localDate()) {
+      Storage.remove('active_workout');
+      return false;
+    }
+    this.activeWorkout = saved.workout;
+    this._timerStart = saved.timerStart || Date.now();
+    this._timerInterval = setInterval(() => this._tickTimer(), 1000);
+    return true;
+  },
+
   startWorkout() {
     const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
     this.activeWorkout = {
@@ -412,6 +435,7 @@ const UI = {
       notes: ''
     };
     this._timerStart = Date.now();
+    this._saveActiveWorkout();
     this.renderActiveWorkout();
     this._timerInterval = setInterval(() => this._tickTimer(), 1000);
   },
@@ -510,6 +534,7 @@ const UI = {
       if (!name) return;
       this._syncFromDOM();
       this.activeWorkout.exercises.push({ id: crypto.randomUUID(), name, sets: [] });
+      this._saveActiveWorkout();
       this.closeModal();
       this.renderActiveWorkout();
       if (!this._timerInterval && this._timerStart) {
@@ -526,6 +551,7 @@ const UI = {
     if (!ex) return;
     const last = ex.sets[ex.sets.length - 1];
     ex.sets.push({ reps: last?.reps || 8, weightKg: last?.weightKg || 0 });
+    this._saveActiveWorkout();
     const body = document.querySelector('.sets-body[data-ex-idx="' + exIdx + '"]');
     if (body) {
       const newSet = ex.sets[ex.sets.length - 1];
@@ -544,6 +570,7 @@ const UI = {
     const ex = this.activeWorkout.exercises[exIdx];
     if (!ex) return;
     ex.sets.splice(setIdx, 1);
+    this._saveActiveWorkout();
     rowEl.remove();
     document.querySelectorAll('.set-row[data-ex-idx="' + exIdx + '"]').forEach((el, i) => {
       el.dataset.setIdx = i;
@@ -558,6 +585,7 @@ const UI = {
     if (isNaN(exIdx) || !this.activeWorkout) return;
     this._syncFromDOM();
     this.activeWorkout.exercises.splice(exIdx, 1);
+    this._saveActiveWorkout();
     this.renderActiveWorkout();
     if (!this._timerInterval && this._timerStart) {
       this._timerInterval = setInterval(() => this._tickTimer(), 1000);
@@ -573,6 +601,7 @@ const UI = {
     this.stopTimer();
     this.activeWorkout = null;
     this._timerStart = null;
+    this._clearActiveWorkout();
     this.renderWorkoutList();
     this.showToast('Workout saved!');
   },
@@ -582,6 +611,7 @@ const UI = {
     this.stopTimer();
     this.activeWorkout = null;
     this._timerStart = null;
+    this._clearActiveWorkout();
     this.renderWorkoutList();
   },
 

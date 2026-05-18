@@ -12,8 +12,12 @@ const App = {
       this.showOnboarding();
     } else {
       this.showApp();
-      UI.renderDashboard();
-      // Fetch LAN IP + latest health data; re-render dashboard when ready
+      if (UI.restoreActiveWorkout()) {
+        this.switchTab('workout');
+      } else {
+        UI.renderDashboard();
+      }
+      // Fetch latest health data; re-render dashboard when ready
       Promise.all([Health.init(), Health.refresh()]).then(() => {
         UI.renderDashboard();
       });
@@ -81,9 +85,7 @@ const App = {
   },
 
   switchTab(tab) {
-    if (UI.activeWorkout && tab !== 'workout') {
-      if (!confirm('You have an active workout. Switch tabs anyway?')) return;
-    }
+    if (UI.activeWorkout) UI._syncFromDOM(); // capture inputs before leaving workout tab
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
     document.querySelectorAll('.tab-section').forEach(s => s.classList.toggle('hidden', s.id !== 'tab-' + tab));
 
